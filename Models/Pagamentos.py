@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
-from datetime import date
-from pessoas import Paciente
+from abc import ABC, abstractmethod # Permite a criacão de classes abstratas e métodos abstratos
+from datetime import date # Ajuda para trabalhar com datas reais
+from pessoas import Paciente # Para que o pagamento saiba exatamente quem é a pessoa que está pagando, criando uma associação direta entre os objetos
 
 class Pagamento(ABC):
     def __init__(self, data: date, paciente: Paciente, valor_pago: float):
@@ -16,7 +16,7 @@ class Pagamento(ABC):
     @valor_pago.setter
     def valor_pago(self, valor):
         if valor <= 0:
-            raise ValueError("O valor pago deve ser maior que zero.")
+            raise ValueError("O valor pago deve ser maior que zero.") # Tratamento de erro caso o valor inserido for menor que 0
         self.__valor_pago = valor
 
 

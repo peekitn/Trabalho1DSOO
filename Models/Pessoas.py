@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
-from datetime import date
+from abc import ABC, abstractmethod # Permite a criacão de classes abstratas e métodos abstratos
+from datetime import date # Ajuda para trabalhar com datas reais
 
 class Pessoa(ABC):
     def __init__(self, nome: str, celular: str, cpf: str):
