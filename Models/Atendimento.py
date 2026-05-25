@@ -8,8 +8,6 @@ class Clinica:
         self.cidade = cidade
         self.descricao = descricao
 
-    # Getters e Setters omitidos para brevidade, mas devem seguir o mesmo padrão.
-
 
 class TipoAtendimento:
     def __init__(self, nome: str):
@@ -28,7 +26,7 @@ class Atendimento:
                  data_atendimento: date, horario_inicio: str, horario_fim: str, 
                  tipo: TipoAtendimento, valor_base: float):
         
-        # Validação de Regra de Negócio (exemplo para o controlador usar depois)
+        # aqui entra a validação de Regra de Negócio (exemplo para o controlador usar depois)
         if not paciente.is_maior_de_idade():
             raise ValueError("Pacientes menores de 18 anos não podem realizar atendimento independente.")
             

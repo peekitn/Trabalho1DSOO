@@ -1,0 +1,76 @@
+classDiagram
+    class Pessoa {
+        <<abstract>>
+        -String nome
+        -String celular
+        -String cpf
+    }
+    
+    class Paciente {
+        -Date dataNascimento
+    }
+    
+    class Profissional {
+        -String especialidade
+        -String registroProfissional
+    }
+
+    class Clinica {
+        -String nome
+        -String cidade
+        -String descricao
+    }
+
+    class TipoAtendimento {
+        -String nome
+    }
+
+    class Procedimento {
+        -String descricao
+        -Float custo
+        -Profissional profissional
+    }
+
+    class Pagamento {
+        <<abstract>>
+        -Date data
+        -Float valorPago
+        -Paciente paciente
+        +calcularRestante() Float
+    }
+
+    class PagamentoDinheiro {
+    }
+
+    class PagamentoPix {
+        -String cpfPagador
+    }
+
+    class PagamentoCartao {
+        -String numeroCartao
+        -String bandeira
+    }
+
+    class Atendimento {
+        -Date data
+        -String horarioInicio
+        -String horarioFim
+        -Float valorTotal
+        +adicionarProcedimento(Procedimento p)
+        +registrarPagamento(Pagamento p)
+    }
+
+    Pessoa <|-- Paciente
+    Pessoa <|-- Profissional
+    Pagamento <|-- PagamentoDinheiro
+    Pagamento <|-- PagamentoPix
+    Pagamento <|-- PagamentoCartao
+
+    Atendimento o-- Clinica
+    Atendimento o-- Paciente
+    Atendimento o-- Profissional
+    Atendimento o-- TipoAtendimento
+    
+    Atendimento *-- Procedimento
+    Atendimento *-- Pagamento
+    Procedimento --> Profissional
