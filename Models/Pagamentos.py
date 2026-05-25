@@ -7,7 +7,7 @@ class Pagamento(ABC):
         self.data = data
         self.paciente = paciente
         self.valor_pago = valor_pago
-        self.atendimento_vinculado = None  # Será setado pela composição no Atendimento
+        self.atendimento_vinculado = None  # No momento em que o Pagamento é criado, ele nasce com a data, o paciente e o valor, mas ele ainda não sabe a qual consulta ou exame (atendimento) ele pertence.
 
     @property
     def valor_pago(self):
