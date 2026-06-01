@@ -3,7 +3,7 @@ class ControladorRelatorios:
         self.__controlador_principal = controlador_principal
 
     # 1. Clínicas com maior número de atendimentos
-    # Eh criado um dicionario onde varre todos os atendimentos um por um. Se a clinica do atendimento ja tiver sido contada, soma 1. Se nao tiver sido contada, inicia a contagem com 1. Depois ordena o dicionario e retorna a lista ordenada.
+    # Cria um dicionário para contar as ocorrências varrendo a lista de atendimentos. Se a clínica já existe no dicionário, soma +1; se não, inicia em 1. Por fim, ordena os dados do maior para o menor com base na quantidade de consultas e retorna a lista.
     def relatorio_clinicas_mais_atendimentos(self):
         atendimentos = self.__controlador_principal.atendimentos
         contagem_clinicas = {}
@@ -19,7 +19,7 @@ class ControladorRelatorios:
         return clinicas_ordenadas
 
     # 2. Atendimentos mais caros e mais baratos
-    # O lambda a: a.calcular_valor_total() diz ao Python para pegar cada atendimento e usar o resultado do cálculo do valor para organizar a fila, do menor para o maior. [0] pega o primeirão da lista (o mais barato). O [-1] é um truque para pegar o último item da lista de trás pra frente (o mais caro), sem precisar saber o tamanho exato da lista.
+    # Ordena a lista de atendimentos com base no valor total calculado, organizando do menor para o maior. Retorna diretamente os extremos dessa fila ordenada usando os índices [0] para capturar o atendimento mais barato e [-1] para capturar o mais caro.
     def relatorio_atendimentos_extremos(self):
         atendimentos = self.__controlador_principal.atendimentos
         if not atendimentos:
@@ -32,6 +32,7 @@ class ControladorRelatorios:
         return mais_caro, mais_barato
 
     # 3. Procedimentos mais realizados (populares)
+    # Acessa a lista encapsulada de procedimentos de cada atendimento e utiliza um dicionário para contabilizar a frequência de execução de cada um. Em seguida, ordena a contagem em ordem decrescente para retornar os procedimentos mais populares no topo.
     def relatorio_procedimentos_mais_realizados(self):
         atendimentos = self.__controlador_principal.atendimentos
         contagem_procedimentos = {}
@@ -49,6 +50,7 @@ class ControladorRelatorios:
         return procedimentos_ordenados
 
     # 4. Procedimentos mais caros e mais baratos
+    # Extrai todos os procedimentos de todos os atendimentos para dentro de uma única lista consolidada utilizando o comando 'extend'. Depois, ordena essa lista geral pelo valor de custo e retorna os itens das extremidades [0] e [-1] representando o mais barato e o mais caro.
     def relatorio_procedimentos_extremos(self):
         atendimentos = self.__controlador_principal.atendimentos
         todos_procedimentos = []
