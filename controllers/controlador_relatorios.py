@@ -1,6 +1,30 @@
+from views.tela_relatorios import TelaRelatorios
+
 class ControladorRelatorios:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
+        self.__tela_relatorios = TelaRelatorios()
+
+    def abrir_tela(self):
+        while True:
+            opcao = self.__tela_relatorios.tela_opcoes()
+            
+            if opcao == 1:
+                dados = self.relatorio_clinicas_mais_atendimentos()
+                self.__tela_relatorios.mostrar_clinicas_mais_atendimentos(dados)
+            elif opcao == 2:
+                caro, barato = self.relatorio_atendimentos_extremos()
+                self.__tela_relatorios.mostrar_atendimentos_extremos(caro, barato)
+            elif opcao == 3:
+                dados = self.relatorio_procedimentos_mais_realizados()
+                self.__tela_relatorios.mostrar_procedimentos_mais_realizados(dados)
+            elif opcao == 4:
+                caro, barato = self.relatorio_procedimentos_extremos()
+                self.__tela_relatorios.mostrar_procedimentos_extremos(caro, barato)
+            elif opcao == 0:
+                break
+            else:
+                self.__tela_relatorios.mostrar_mensagem("Opcao invalida!")
 
     # 1. Clínicas com maior número de atendimentos
     # Cria um dicionário para contar as ocorrências varrendo a lista de atendimentos. Se a clínica já existe no dicionário, soma +1; se não, inicia em 1. Por fim, ordena os dados do maior para o menor com base na quantidade de consultas e retorna a lista.
