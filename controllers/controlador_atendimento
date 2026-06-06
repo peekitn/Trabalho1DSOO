@@ -1,0 +1,77 @@
+class AtendimentoControlador:
+    def __init__(self, view: AtendimentoView):
+        self.__view = view
+        self.__atendimentos_cadastrados = []
+
+    def _validar_idade_paciente(self, paciente, data_atendimento: date):
+        # Calcula a idade baseada na data do atendimento
+        data_nasc = paciente.data_nascimento
+        idade = data_atendimento.year - data_nasc.year - ((data_atendimento.month, data_atendimento.day) < (data_nasc.month, data_nasc.day))
+        
+        if idade < 18:
+            raise MenorDeIdadeException()
+
+    def _validar_horario_clinica(self, horario_inicio: str):
+        #Aa clínicas funcionam das 08:00 às 18:00 
+        hora = int(horario_inicio.split(":")[0])
+        if hora < 8 or hora >= 18:
+            raise ForaDoHorarioComercialException()
+
+    def agendar_atendimento(self, clinica, paciente, profissional, tipo_atendimento):
+        try:
+            data_str, h_inicio, h_fim, valor_base = self.__view.ler_dados_agendamento()
+            data_atendimento = datetime.strptime(data_str, "%d/%m/%Y").date()
+
+            # Aplicando as regras de negócio antes de instanciar
+            self._validar_idade_paciente(paciente, data_atendimento)
+            self._validar_horario_clinica(h_inicio)
+
+            novo_atendimento = Atendimento(
+                data=data_atendimento,
+                horario_inicio=h_inicio,
+                horario_fim=h_fim,
+                valor_base=valor_base,
+                clinica=clinica,
+                paciente=paciente,
+                profissional=profissional,
+                tipo=tipo_atendimento
+            )
+
+            self.__atendimentos_cadastrados.append(novo_atendimento)
+            self.__view.mostrar_mensagem("Atendimento agendado com sucesso!")
+            return novo_atendimento
+
+        except ValueError:
+            self.__view.mostrar_erro("Formato de data ou número inválido inserido.")
+        except (MenorDeIdadeException, ForaDoHorarioComercialException) as e:
+            self.__view.mostrar_erro(str(e))
+        except Exception as e:
+            self.__view.mostrar_erro(f"Erro inesperado: {str(e)}")
+
+    def processar_pagamento(self, atendimento: Atendimento):
+        try:
+            self.__view.mostrar_mensagem(f"Valor restante: R$ {atendimento.calcularValorRestante():.2f}")
+            modalidade, valor = self.__view.ler_dados_pagamento()
+            
+            data_hoje = date.today()
+            novo_pagamento = None
+
+            if modalidade == '1':
+                novo_pagamento = PagamentoDinheiro(data_hoje, valor, atendimento.paciente, atendimento)
+            elif modalidade == '2':
+                cpf = input("Digite o CPF do pagador (PIX): ")
+                novo_pagamento = PagamentoPix(data_hoje, valor, atendimento.paciente, atendimento, cpf)
+            elif modalidade == '3':
+                cartao = input("Número do cartão: ")
+                bandeira = input("Bandeira: ")
+                novo_pagamento = PagamentoCartao(data_hoje, valor, atendimento.paciente, atendimento, cartao, bandeira)
+            else:
+                self.__view.mostrar_erro("Modalidade inválida.")
+                return
+
+            # O próprio model Atendimento realiza a validação da data
+            atendimento.registrarPagamento(novo_pagamento)
+            self.__view.mostrar_mensagem(f"Pagamento de R$ {valor:.2f} registrado. Restante: R$ {atendimento.calcularValorRestante():.2f}")
+
+        except (PagamentoAtrasadoException, ValorInvalidoException) as e:
+            self.__view.mostrar_erro(str(e))
