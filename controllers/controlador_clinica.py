@@ -55,3 +55,28 @@ class ControladorClinica:
         for clinica in self.__controlador_principal.clinicas:
             # Envia os dados para a View renderizar
             self.__view.mostrar_clinica(clinica.nome, clinica.cidade)
+
+     def excluir_clinica(self):
+        try:
+            nome, cidade = self.__view.ler_dados_exclusao()
+
+            if not nome or not cidade:
+                raise DadoObrigatorioException("Nome e Cidade são obrigatórios para realizar a exclusão.")
+
+            clinica_para_remover = None
+            
+            # Busca a clínica pela combinação de nome e cidade
+            for clinica in self.__clinicas_cadastradas:
+                if clinica.nome.lower() == nome.lower() and clinica.cidade.lower() == cidade.lower():
+                    clinica_para_remover = clinica
+                    break
+
+            if not clinica_para_remover:
+                raise RegistroNaoEncontradoException("Clínica não encontrada para exclusão.")
+            self.__clinicas_cadastradas.remove(clinica_para_remover)
+            self.__view.mostrar_mensagem("Clínica excluída com sucesso!")
+
+        except (DadoObrigatorioException, RegistroNaoEncontradoException) as e:
+            self.__view.mostrar_erro(str(e))
+        except Exception as e:
+            self.__view.mostrar_erro(f"Erro ao excluir clínica: {str(e)}")
