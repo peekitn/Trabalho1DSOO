@@ -1,7 +1,8 @@
 from views.tela_atendimento import TelaAtendimento
 from datetime import datetime, date
-from models.atendimento import Atendimento, MenorDeIdadeException, ForaDoHorarioComercialException, PagamentoAtrasadoException, ValorInvalidoException
+from models.atendimento import Atendimento, TipoAtendimento, MenorDeIdadeException, ForaDoHorarioComercialException, PagamentoAtrasadoException, ValorInvalidoException
 from models.pagamentos import PagamentoDinheiro, PagamentoPix, PagamentoCartao
+
 
 class ControladorAtendimento:
     def __init__(self, controlador_principal):
@@ -59,13 +60,13 @@ class ControladorAtendimento:
             novo_pagamento = None
 
             if modalidade == '1':
-                novo_pagamento = PagamentoDinheiro(data_hoje, valor, atendimento.paciente, atendimento)
+                novo_pagamento = PagamentoDinheiro(data_hoje, atendimento.paciente, valor)
             elif modalidade == '2':
                 cpf = self.__view.ler_dados_pix() 
-                novo_pagamento = PagamentoPix(data_hoje, valor, atendimento.paciente, atendimento, cpf)
+                novo_pagamento = PagamentoPix(data_hoje, atendimento.paciente, valor, cpf)
             elif modalidade == '3':
                 cartao, bandeira = self.__view.ler_dados_cartao() 
-                novo_pagamento = PagamentoCartao(data_hoje, valor, atendimento.paciente, atendimento, cartao, bandeira)
+                novo_pagamento = PagamentoCartao(data_hoje, atendimento.paciente, valor, cartao, bandeira)
             else:
                 self.__view.mostrar_erro("Modalidade invalida.")
                 return
@@ -78,17 +79,72 @@ class ControladorAtendimento:
 
     def abrir_tela(self):
         while True:
-            opcao = self.__view.tela_opcoes()
+            try:
+                opcao = self.__view.tela_opcoes()
+                
+                if opcao == 1:
+                    self._iniciar_agendamento()
+                elif opcao == 2:
+                    self._iniciar_pagamento()
+                elif opcao == 0:
+                    break
+                else:
+                    self.__view.mostrar_erro("Opcao invalida.")
+            except ValueError:
+                self.__view.mostrar_erro("Digite um numero valido.")
+
+    def _iniciar_agendamento(self):
+        if not self.__controlador_principal.pacientes:
+            self.__view.mostrar_erro("Cadastre um paciente primeiro.")
+            return
+        if not self.__controlador_principal.clinicas:
+            self.__view.mostrar_erro("Cadastre uma clinica primeiro.")
+            return
+        if not self.__controlador_principal.profissionais:
+            self.__view.mostrar_erro("Cadastre um profissional primeiro.")
+            return
+
+        cpf_paciente = self.__view.pedir_cpf_paciente()
+        paciente = next((p for p in self.__controlador_principal.pacientes if p.cpf == cpf_paciente), None)
+        if not paciente:
+            self.__view.mostrar_erro("Paciente nao encontrado.")
+            return
+
+        cpf_prof = self.__view.pedir_cpf_profissional()
+        profissional = next((p for p in self.__controlador_principal.profissionais if p.cpf == cpf_prof), None)
+        if not profissional:
+            self.__view.mostrar_erro("Profissional nao encontrado.")
+            return
+
+        nome_clinica = self.__view.pedir_nome_clinica()
+        clinica = next((c for c in self.__controlador_principal.clinicas if c.nome.lower() == nome_clinica.lower()), None)
+        if not clinica:
+            self.__view.mostrar_erro("Clinica nao encontrada.")
+            return
+        nome_tipo = self.__view.pedir_tipo_atendimento()
+        tipo = TipoAtendimento(nome_tipo)
+
+        self.agendar_atendimento(clinica, paciente, profissional, tipo)
+
+    def _iniciar_pagamento(self):
+        if not self.__controlador_principal.atendimentos:
+            self.__view.mostrar_erro("Nenhum atendimento registrado no sistema.")
+            return
+
+        # Lista os atendimentos disponíveis
+        self.__view.mostrar_mensagem("Atendimentos Disponíveis:")
+        for i, at in enumerate(self.__controlador_principal.atendimentos):
+            self.__view.mostrar_mensagem(f"[{i}] Paciente: {at.paciente.nome} | Restante a Pagar: R$ {at.calcular_valor_restante():.2f}")
+
+        try:
+            indice = self.__view.pedir_indice_atendimento()
+            atendimento_selecionado = self.__controlador_principal.atendimentos[indice]
             
-            if opcao == 1:
-                self.__view.mostrar_mensagem("Funcao de agendar acionada!")
-                # ARRUMAR DEPOIS
-                # ARRUMAR DEPOIS
-            elif opcao == 2:
-                self.__view.mostrar_mensagem("Funcao de pagamento acionada!")
-                # ARRUMAR DEPOIS
-                # ARRUMAR DEPOIS
-            elif opcao == 0:
-                break
-            else:
-                self.__view.mostrar_erro("Opcao invalida.")
+            if atendimento_selecionado.calcular_valor_restante() <= 0:
+                self.__view.mostrar_erro("Este atendimento ja esta totalmente pago!")
+                return
+                
+            # Chama o seu método original de pagamento
+            self.processar_pagamento(atendimento_selecionado)
+        except (IndexError, ValueError):
+            self.__view.mostrar_erro("Indice invalido.")

@@ -3,6 +3,8 @@
 from controllers.controlador_relatorios import ControladorRelatorios
 from controllers.controlador_paciente import ControladorPaciente
 from controllers.controlador_atendimento import ControladorAtendimento
+from controllers.controlador_clinica import ControladorClinica
+from controllers.controlador_profissional import ControladorProfissional
 from views.tela_principal import TelaPrincipal
 
 class ControladorPrincipal:
@@ -20,6 +22,8 @@ class ControladorPrincipal:
         self.controlador_relatorios = ControladorRelatorios(self)
         self.controlador_paciente = ControladorPaciente(self)
         self.controlador_atendimento = ControladorAtendimento(self)
+        self.controlador_clinica = ControladorClinica(self)
+        self.controlador_profissional = ControladorProfissional(self)
 
     def iniciar(self):
         while True:
@@ -28,12 +32,13 @@ class ControladorPrincipal:
             if opcao == 1:
                 self.controlador_paciente.abrir_tela()
             elif opcao == 2:
-                # self.controlador_clinica.abrir_tela()
-                print("Construindo ainda")
+                self.controlador_clinica.abrir_tela()
             elif opcao == 3:
                 self.controlador_relatorios.abrir_tela()
             elif opcao == 4:
                 self.controlador_atendimento.abrir_tela()
+            elif opcao == 5:
+                self.controlador_profissional.abrir_tela()
             elif opcao == 0:
                 print("Sistema encerrado.")
                 break

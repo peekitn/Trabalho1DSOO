@@ -6,7 +6,8 @@ class TelaPrincipal:
         print("1 - Modulo de Pacientes")
         print("2 - Modulo de Clinicas")
         print("3 - Modulo de Relatorios")
-        print("4 - Modulo de Atendimentos") 
+        print("4 - Modulo de Atendimentos")
+        print("5 - Modulo de Profissionais")
         print("0 - Encerrar Sistema")
         opcao = int(input("Escolha a opcao: "))
         return opcao

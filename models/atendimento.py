@@ -2,6 +2,14 @@ from datetime import date
 from models.pessoas import Paciente, Profissional
 from models.pagamentos import Pagamento
 
+class DadoObrigatorioException(Exception):
+    def __init__(self, mensagem="Campos obrigatorios nao preenchidos."):
+        super().__init__(mensagem)
+
+class RegistroDuplicadoException(Exception):
+    def __init__(self, mensagem="Este registro ja existe no sistema."):
+        super().__init__(mensagem)
+
 class MenorDeIdadeException(Exception):
     def __init__(self, mensagem="Paciente menor de idade não pode agendar sozinho."):
         super().__init__(mensagem)

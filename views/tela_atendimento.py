@@ -11,7 +11,6 @@ class TelaAtendimento:
         horario_inicio = input("Horario de Inicio (HH:MM): ")
         horario_fim = input("Horario de Termino (HH:MM): ")
         valor_base = float(input("Valor Base (R$): "))
-        # IDs de paciente, clinica, etc. seriam lidos aqui e buscados no Controller
         return data_str, horario_inicio, horario_fim, valor_base
 
     def ler_dados_pagamento(self):
@@ -36,3 +35,18 @@ class TelaAtendimento:
         print("0 - Voltar")
         opcao = int(input("Escolha a opcao: "))
         return opcao
+
+    def pedir_cpf_paciente(self):
+        return input("Digite o CPF do Paciente: ").strip()
+
+    def pedir_cpf_profissional(self):
+        return input("Digite o CPF do Profissional: ").strip()
+
+    def pedir_nome_clinica(self):
+        return input("Digite o Nome da Clinica: ").strip()
+
+    def pedir_tipo_atendimento(self):
+        return input("Tipo de Atendimento (Ex: Consulta, Exame): ").strip()
+
+    def pedir_indice_atendimento(self):
+        return int(input("Digite o NUMERO (indice) do atendimento que deseja pagar: "))

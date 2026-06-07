@@ -1,37 +1,57 @@
+from views.tela_clinica import TelaClinica
+from models.atendimento import Clinica, DadoObrigatorioException, RegistroDuplicadoException
+
 class ControladorClinica:
-    def __init__(self, view: TelaClinica):
-        self.__view = view
-        self.__clinicas_cadastradas = []
+    def __init__(self, controlador_principal):
+        self.__controlador_principal = controlador_principal
+        self.__view = TelaClinica()
+
+    def abrir_tela(self):
+        while True:
+            try:
+                opcao = self.__view.tela_opcoes()
+                if opcao == 1:
+                    self.cadastrar_clinica()
+                elif opcao == 2:
+                    self.listar_clinicas()
+                elif opcao == 0:
+                    break
+                else:
+                    self.__view.mostrar_erro("Opcao invalida.")
+            except ValueError:
+                self.__view.mostrar_erro("Digite um numero inteiro valido.")
 
     def cadastrar_clinica(self):
         try:
             nome, cidade, descricao = self.__view.ler_dados_clinica()
 
-            # Validação da regra de negócio
             if not nome or not cidade:
-                raise DadoObrigatorioException("Nome e Cidade são obrigatórios para cadastro de clínica.")
+                raise DadoObrigatorioException("Nome e Cidade sao obrigatorios para cadastro de clinica.")
 
-            # Verifica se uma clínica já não foi cadastrada, para evitar o cadastro repetido.
-            for clinica in self.__clinicas_cadastradas:
+            # Busca na lista central do Controlador Principal
+            for clinica in self.__controlador_principal.clinicas:
                 if clinica.nome.lower() == nome.lower() and clinica.cidade.lower() == cidade.lower():
-                    raise RegistroDuplicadoException("Já existe uma clínica cadastrada com este nome nesta cidade.")
+                    raise RegistroDuplicadoException("Ja existe uma clinica cadastrada com este nome nesta cidade.")
 
+            # Instancia e salva no banco central
             nova_clinica = Clinica(nome, cidade, descricao)
-            self.__clinicas_cadastradas.append(nova_clinica)
+            self.__controlador_principal.clinicas.append(nova_clinica)
             
-            self.__view.mostrar_mensagem("Clínica cadastrada com sucesso!")
+            self.__view.mostrar_mensagem("Clinica cadastrada com sucesso!")
             return nova_clinica
 
         except (DadoObrigatorioException, RegistroDuplicadoException) as e:
             self.__view.mostrar_erro(str(e))
         except Exception as e:
-            self.__view.mostrar_erro(f"Erro ao cadastrar clínica: {str(e)}")
+            self.__view.mostrar_erro(f"Erro ao cadastrar clinica: {str(e)}")
 
     def listar_clinicas(self):
-        if not self.__clinicas_cadastradas:
-            self.__view.mostrar_mensagem("Nenhuma clínica cadastrada.")
+        # Varre a lista central do Controlador Principal
+        if not self.__controlador_principal.clinicas:
+            self.__view.mostrar_mensagem("Nenhuma clinica cadastrada.")
             return
 
-        self.__view.mostrar_mensagem("Lista de Clínicas")
-        for clinica in self.__clinicas_cadastradas:
-            print(f"- {clinica.nome} ({clinica.cidade})")
+        self.__view.mostrar_mensagem("Lista de Clinicas:")
+        for clinica in self.__controlador_principal.clinicas:
+            # Envia os dados para a View renderizar
+            self.__view.mostrar_clinica(clinica.nome, clinica.cidade)
