@@ -1,6 +1,11 @@
 from views.tela_clinica import TelaClinica
 from models.atendimento import Clinica, DadoObrigatorioException, RegistroDuplicadoException
 
+        
+class RegistroNaoEncontradoException(Exception):
+    def __init__(self, mensagem="O registro solicitado não existe."):
+        super().__init__(mensagem)
+
 class ControladorClinica:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
