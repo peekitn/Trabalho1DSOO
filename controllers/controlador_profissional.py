@@ -70,3 +70,19 @@ class ControladorProfissional:
         self.__view.mostrar_mensagem("Lista de Profissionais:")
         for prof in self.__controlador_principal.profissionais:
             self.__view.mostrar_profissional(prof.nome, prof.cpf, prof.especialidade, prof.registro_profissional)
+
+    def excluir_profissional(self):
+        try:
+            cpf = self.__view.ler_dado_exclusao()
+            self._validar_cpf(cpf)
+
+            profissional_para_remover = self.buscar_profissional_por_cpf(cpf)
+            if not profissional_para_remover:
+                raise RegistroNaoEncontradoException(f"Profissional com CPF {cpf} não encontrado.")
+            self.__profissionais_cadastrados.remove(profissional_para_remover)
+            self.__view.mostrar_mensagem("Profissional excluído com sucesso!")
+
+        except (CpfInvalidoException, RegistroNaoEncontradoException) as e:
+            self.__view.mostrar_erro(str(e))
+        except Exception as e:
+            self.__view.mostrar_erro(f"Erro ao excluir profissional: {str(e)}")
