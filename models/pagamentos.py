@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod # Permite a criacão de classes abstratas e métodos abstratos
 from datetime import date # Ajuda para trabalhar com datas reais
-from pessoas import Paciente # Para que o pagamento saiba exatamente quem é a pessoa que está pagando, criando uma associação direta entre os objetos
+from models.pessoas import Paciente # Para que o pagamento saiba exatamente quem é a pessoa que está pagando, criando uma associação direta entre os objetos
 
 class Pagamento(ABC):
     def __init__(self, data: date, paciente: Paciente, valor_pago: float):

@@ -1,6 +1,8 @@
 # Francisco
 
 from controllers.controlador_relatorios import ControladorRelatorios
+from controllers.controlador_paciente import ControladorPaciente
+from controllers.controlador_atendimento import ControladorAtendimento
 from views.tela_principal import TelaPrincipal
 
 class ControladorPrincipal:
@@ -14,22 +16,24 @@ class ControladorPrincipal:
         # Instancia a tela do menu inicial
         self.tela_principal = TelaPrincipal()
         
-        # Instancia os controladores (os da dupla vão entrar aqui depois)
+        # Instancia os controladores
         self.controlador_relatorios = ControladorRelatorios(self)
-        # self.controlador_paciente = ControladorPaciente(self)
+        self.controlador_paciente = ControladorPaciente(self)
+        self.controlador_atendimento = ControladorAtendimento(self)
 
     def iniciar(self):
         while True:
             opcao = self.tela_principal.tela_opcoes()
             
             if opcao == 1:
-                # self.controlador_paciente.abrir_tela()
-                print("Módulo em construção pela dupla...")
+                self.controlador_paciente.abrir_tela()
             elif opcao == 2:
                 # self.controlador_clinica.abrir_tela()
-                print("Módulo em construção pela dupla...")
+                print("Construindo ainda")
             elif opcao == 3:
                 self.controlador_relatorios.abrir_tela()
+            elif opcao == 4:
+                self.controlador_atendimento.abrir_tela()
             elif opcao == 0:
                 print("Sistema encerrado.")
                 break

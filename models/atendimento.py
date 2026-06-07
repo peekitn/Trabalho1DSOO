@@ -1,6 +1,22 @@
 from datetime import date
-from pessoas import Paciente, Profissional
-from pagamentos import Pagamento
+from models.pessoas import Paciente, Profissional
+from models.pagamentos import Pagamento
+
+class MenorDeIdadeException(Exception):
+    def __init__(self, mensagem="Paciente menor de idade não pode agendar sozinho."):
+        super().__init__(mensagem)
+
+class ForaDoHorarioComercialException(Exception):
+    def __init__(self, mensagem="Horário fora do expediente da clínica (08:00 às 18:00)."):
+        super().__init__(mensagem)
+
+class PagamentoAtrasadoException(Exception):
+    def __init__(self, mensagem="O pagamento está atrasado."):
+        super().__init__(mensagem)
+
+class ValorInvalidoException(Exception):
+    def __init__(self, mensagem="O valor inserido para pagamento é inválido."):
+        super().__init__(mensagem)
 
 class Clinica:
     def __init__(self, nome: str, cidade: str, descricao: str):
