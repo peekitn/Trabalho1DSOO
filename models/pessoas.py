@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod # Permite a criacão de classes abstratas e métodos abstratos
-from datetime import date # Ajuda para trabalhar com datas reais
+from abc import ABC, abstractmethod
+from datetime import date
 
 class Pessoa(ABC):
     def __init__(self, nome: str, celular: str, cpf: str):
@@ -33,6 +33,10 @@ class Pessoa(ABC):
     def cpf(self, valor):
         self.__cpf = valor
 
+    @abstractmethod
+    def get_tipo(self):
+        pass
+
 
 class Paciente(Pessoa):
     def __init__(self, nome: str, celular: str, cpf: str, data_nascimento: date):
@@ -51,6 +55,9 @@ class Paciente(Pessoa):
         hoje = date.today()
         idade = hoje.year - self.data_nascimento.year - ((hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day))
         return idade >= 18
+
+    def get_tipo(self):
+        return "Paciente"
 
 
 class Profissional(Pessoa):
@@ -74,3 +81,6 @@ class Profissional(Pessoa):
     @registro_profissional.setter
     def registro_profissional(self, valor):
         self.__registro_profissional = valor
+
+    def get_tipo(self):
+        return "Profissional"

@@ -81,3 +81,17 @@ class Atendimento:
     def calcular_valor_restante(self) -> float:
         total_pago = sum(p.valor_pago for p in self.__pagamentos)
         return self.calcular_valor_total() - total_pago
+    
+    def get_procedimentos(self):
+        return self.__procedimentos
+
+    def get_pagamentos(self):
+        return self.__pagamentos
+
+    def remover_procedimento(self, procedimento):
+        if procedimento in self.__procedimentos:
+            self.__procedimentos.remove(procedimento)
+
+    def remover_pagamento(self, pagamento):
+        if pagamento in self.__pagamentos:
+            self.__pagamentos.remove(pagamento)

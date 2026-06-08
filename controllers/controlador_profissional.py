@@ -23,6 +23,10 @@ class ControladorProfissional:
                     self.cadastrar_profissional()
                 elif opcao == 2:
                     self.listar_profissionais()
+                elif opcao == 3:
+                    self.excluir_profissional()
+                elif opcao == 4:
+                    self.alterar_profissional()
                 elif opcao == 0:
                     break
                 else:
@@ -82,11 +86,53 @@ class ControladorProfissional:
 
             profissional_para_remover = self.buscar_profissional_por_cpf(cpf)
             if not profissional_para_remover:
-                raise RegistroNaoEncontradoException(f"Profissional com CPF {cpf} não encontrado.")
-            self.__profissionais_cadastrados.remove(profissional_para_remover)
-            self.__view.mostrar_mensagem("Profissional excluído com sucesso!")
+                raise RegistroNaoEncontradoException(f"Profissional com CPF {cpf} nao encontrado.")
+            
+            # Remove do controlador principal
+            self.__controlador_principal.profissionais.remove(profissional_para_remover)
+            self.__view.mostrar_mensagem("Profissional excluido com sucesso!")
 
         except (CpfInvalidoException, RegistroNaoEncontradoException) as e:
             self.__view.mostrar_erro(str(e))
         except Exception as e:
             self.__view.mostrar_erro(f"Erro ao excluir profissional: {str(e)}")
+
+    def alterar_profissional(self):
+        try:
+            # Reaproveita a função para pedir o CPF antigo
+            cpf = self.__view.ler_dado_exclusao()
+            self._validar_cpf(cpf)
+
+            profissional_para_alterar = self.buscar_profissional_por_cpf(cpf)
+            if not profissional_para_alterar:
+                raise RegistroNaoEncontradoException(f"Profissional com CPF {cpf} nao encontrado.")
+
+            self.__view.mostrar_mensagem("Digite os NOVOS dados do profissional:")
+            novo_nome, novo_celular, novo_cpf, nova_especialidade, novo_registro = self.__view.ler_dados_profissional()
+
+            if not novo_nome or not nova_especialidade or not novo_registro:
+                raise DadoObrigatorioException("Nome, especialidade e registro sao obrigatorios.")
+
+            self._validar_cpf(novo_cpf)
+
+            # Verifica se o novo CPF ou novo Registro já existem em OUTRO profissional
+            for prof in self.__controlador_principal.profissionais:
+                if prof != profissional_para_alterar:
+                    if prof.cpf == novo_cpf:
+                        raise RegistroDuplicadoException(f"O CPF {novo_cpf} ja esta cadastrado.")
+                    if prof.registro_profissional == novo_registro:
+                        raise RegistroDuplicadoException(f"O registro {novo_registro} ja esta vinculado a outro profissional.")
+
+            # Atualiza os dados
+            profissional_para_alterar.nome = novo_nome
+            profissional_para_alterar.celular = novo_celular
+            profissional_para_alterar.cpf = novo_cpf
+            profissional_para_alterar.especialidade = nova_especialidade
+            profissional_para_alterar.registro_profissional = novo_registro
+
+            self.__view.mostrar_mensagem("Profissional alterado com sucesso!")
+
+        except (DadoObrigatorioException, CpfInvalidoException, RegistroNaoEncontradoException, RegistroDuplicadoException) as e:
+            self.__view.mostrar_erro(str(e))
+        except Exception as e:
+            self.__view.mostrar_erro(f"Erro ao alterar profissional: {str(e)}")

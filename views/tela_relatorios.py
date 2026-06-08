@@ -13,10 +13,11 @@ class TelaRelatorios:
 
     def mostrar_clinicas_mais_atendimentos(self, clinicas_ordenadas):
         print("\n--- Clinicas com Mais Atendimentos ---")
-        for clinica, quantidade in clinicas_ordenadas:
-            print(f"Clinica: {clinica} | Total de Atendimentos: {quantidade}")
-        else:
+        if not clinicas_ordenadas:
             print("Nenhum atendimento registrado no sistema.")
+        else:
+            for clinica, quantidade in clinicas_ordenadas:
+                print(f"Clinica: {clinica} | Total de Atendimentos: {quantidade}")
         print("--------------------------------------\n")
 
     def mostrar_atendimentos_extremos(self, mais_caro, mais_barato):
@@ -30,10 +31,11 @@ class TelaRelatorios:
 
     def mostrar_procedimentos_mais_realizados(self, procedimentos_ordenados):
         print("\n--- Procedimentos Mais Populares ---")
-        for procedimento, quantidade in procedimentos_ordenados:
-            print(f"Procedimento: {procedimento} | Realizados: {quantidade} vezes")
+        if not procedimentos_ordenados:
+            print("Nenhum procedimento registrado no sistema.")
         else:
-            print("Nenhum atendimento registrado no sistema.")
+            for procedimento, quantidade in procedimentos_ordenados:
+                print(f"Procedimento: {procedimento} | Realizados: {quantidade} vezes")
         print("------------------------------------\n")
 
     def mostrar_procedimentos_extremos(self, mais_caro, mais_barato):

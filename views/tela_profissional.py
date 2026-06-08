@@ -3,6 +3,8 @@ class TelaProfissional:
         print("\n--- Modulo de Profissionais ---")
         print("1 - Cadastrar Profissional")
         print("2 - Listar Profissionais")
+        print("3 - Excluir Profissional")
+        print("4 - Alterar Profissional")
         print("0 - Voltar")
         opcao = int(input("Escolha a opcao: "))
         return opcao
@@ -14,7 +16,7 @@ class TelaProfissional:
         print(f"\n[ERRO] {mensagem}")
 
     def ler_dados_profissional(self):
-        print("\n--- Cadastro de Profissional ---")
+        print("\n--- Dados do Profissional ---")
         nome = input("Nome: ").strip()
         celular = input("Celular: ").strip()
         cpf = input("CPF (apenas numeros): ").strip()
@@ -24,3 +26,8 @@ class TelaProfissional:
 
     def mostrar_profissional(self, nome, cpf, especialidade, registro):
         print(f"- {nome} | CPF: {cpf} | Especialidade: {especialidade} | Reg: {registro}")
+
+    def ler_dado_exclusao(self):
+        print("\n--- Buscar Profissional ---")
+        cpf = input("CPF do profissional: ").strip()
+        return cpf

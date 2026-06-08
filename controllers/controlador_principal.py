@@ -27,20 +27,24 @@ class ControladorPrincipal:
 
     def iniciar(self):
         while True:
-            opcao = self.tela_principal.tela_opcoes()
+            try:
+                opcao = self.tela_principal.tela_opcoes()
+                
+                if opcao == 1:
+                    self.controlador_paciente.abrir_tela()
+                elif opcao == 2:
+                    self.controlador_clinica.abrir_tela()
+                elif opcao == 3:
+                    self.controlador_relatorios.abrir_tela()
+                elif opcao == 4:
+                    self.controlador_atendimento.abrir_tela()
+                elif opcao == 5:
+                    self.controlador_profissional.abrir_tela()
+                elif opcao == 0:
+                    self.tela_principal.mostrar_mensagem("Encerrando o sistema...")
+                    break
+                else:
+                    self.tela_principal.mostrar_erro("Opcao invalida. Escolha um numero do menu.")
             
-            if opcao == 1:
-                self.controlador_paciente.abrir_tela()
-            elif opcao == 2:
-                self.controlador_clinica.abrir_tela()
-            elif opcao == 3:
-                self.controlador_relatorios.abrir_tela()
-            elif opcao == 4:
-                self.controlador_atendimento.abrir_tela()
-            elif opcao == 5:
-                self.controlador_profissional.abrir_tela()
-            elif opcao == 0:
-                print("Sistema encerrado.")
-                break
-            else:
-                print("Opção inválida.")
+            except ValueError:
+                self.tela_principal.mostrar_erro("Entrada invalida! Por favor, digite um numero inteiro.")

@@ -11,3 +11,9 @@ class TelaPrincipal:
         print("0 - Encerrar Sistema")
         opcao = int(input("Escolha a opcao: "))
         return opcao
+    
+    def mostrar_mensagem(self, mensagem: str):
+        print(f"\n[SISTEMA] {mensagem}")
+
+    def mostrar_erro(self, mensagem: str):
+        print(f"\n[ERRO] {mensagem}")

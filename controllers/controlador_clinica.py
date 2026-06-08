@@ -19,6 +19,10 @@ class ControladorClinica:
                     self.cadastrar_clinica()
                 elif opcao == 2:
                     self.listar_clinicas()
+                elif opcao == 3:
+                    self.excluir_clinica()
+                elif opcao == 4:
+                    self.alterar_clinica()
                 elif opcao == 0:
                     break
                 else:
@@ -61,27 +65,68 @@ class ControladorClinica:
             # Envia os dados para a View renderizar
             self.__view.mostrar_clinica(clinica.nome, clinica.cidade)
 
-     def excluir_clinica(self):
+    def excluir_clinica(self): 
         try:
             nome, cidade = self.__view.ler_dados_exclusao()
 
             if not nome or not cidade:
-                raise DadoObrigatorioException("Nome e Cidade são obrigatórios para realizar a exclusão.")
+                raise DadoObrigatorioException("Nome e Cidade sao obrigatorios para realizar a exclusao.")
 
             clinica_para_remover = None
             
-            # Busca a clínica pela combinação de nome e cidade
-            for clinica in self.__clinicas_cadastradas:
+            for clinica in self.__controlador_principal.clinicas:
                 if clinica.nome.lower() == nome.lower() and clinica.cidade.lower() == cidade.lower():
                     clinica_para_remover = clinica
                     break
 
             if not clinica_para_remover:
-                raise RegistroNaoEncontradoException("Clínica não encontrada para exclusão.")
-            self.__clinicas_cadastradas.remove(clinica_para_remover)
-            self.__view.mostrar_mensagem("Clínica excluída com sucesso!")
+                raise RegistroNaoEncontradoException("Clinica nao encontrada para exclusao.")
+            
+            self.__controlador_principal.clinicas.remove(clinica_para_remover)
+            self.__view.mostrar_mensagem("Clinica excluida com sucesso!")
 
         except (DadoObrigatorioException, RegistroNaoEncontradoException) as e:
             self.__view.mostrar_erro(str(e))
         except Exception as e:
-            self.__view.mostrar_erro(f"Erro ao excluir clínica: {str(e)}")
+            self.__view.mostrar_erro(f"Erro ao excluir clinica: {str(e)}")
+
+    def alterar_clinica(self):
+        try:
+            # Reaproveita a função de pedir o nome e cidade para achar a clínica
+            nome, cidade = self.__view.ler_dados_exclusao()
+
+            if not nome or not cidade:
+                raise DadoObrigatorioException("Nome e Cidade sao obrigatorios para buscar a clinica.")
+
+            clinica_para_alterar = None
+            
+            for clinica in self.__controlador_principal.clinicas:
+                if clinica.nome.lower() == nome.lower() and clinica.cidade.lower() == cidade.lower():
+                    clinica_para_alterar = clinica
+                    break
+
+            if not clinica_para_alterar:
+                raise RegistroNaoEncontradoException("Clinica nao encontrada para alteracao.")
+
+            self.__view.mostrar_mensagem("Digite os NOVOS dados da clinica:")
+            novo_nome, nova_cidade, nova_descricao = self.__view.ler_dados_clinica()
+
+            if not novo_nome or not nova_cidade:
+                raise DadoObrigatorioException("Novo Nome e Cidade sao obrigatorios.")
+
+            # Verifica se os novos dados já não existem em OUTRA clínica
+            for clinica in self.__controlador_principal.clinicas:
+                if clinica != clinica_para_alterar and clinica.nome.lower() == novo_nome.lower() and clinica.cidade.lower() == nova_cidade.lower():
+                    raise RegistroDuplicadoException("Ja existe outra clinica com este nome e cidade.")
+
+            # Atualiza os dados
+            clinica_para_alterar.nome = novo_nome
+            clinica_para_alterar.cidade = nova_cidade
+            clinica_para_alterar.descricao = nova_descricao
+
+            self.__view.mostrar_mensagem("Clinica alterada com sucesso!")
+
+        except (DadoObrigatorioException, RegistroNaoEncontradoException, RegistroDuplicadoException) as e:
+            self.__view.mostrar_erro(str(e))
+        except Exception as e:
+            self.__view.mostrar_erro(f"Erro ao alterar clinica: {str(e)}")
