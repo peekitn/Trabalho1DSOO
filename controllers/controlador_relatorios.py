@@ -1,11 +1,11 @@
-# Francisco
-
 from views.tela_relatorios import TelaRelatorios
+from daos.atendimento_dao import AtendimentoDAO  # Importa o DAO
 
 class ControladorRelatorios:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
         self.__tela_relatorios = TelaRelatorios()
+        self.__atendimento_dao = AtendimentoDAO()  # Instancia o DAO
 
     def abrir_tela(self):
         while True:
@@ -29,11 +29,11 @@ class ControladorRelatorios:
                 self.__tela_relatorios.mostrar_mensagem("Opcao invalida!")
 
     # 1. Clínicas com maior número de atendimentos
-    # Cria um dicionário para contar as ocorrências varrendo a lista de atendimentos. Se a clínica já existe no dicionário, soma +1; se não, inicia em 1. Por fim, ordena os dados do maior para o menor com base na quantidade de consultas e retorna a lista.
     def relatorio_clinicas_mais_atendimentos(self):
-        atendimentos = self.__controlador_principal.atendimentos
-        contagem_clinicas = {}
+        # AQUI É A GRANDE MUDANÇA (Substitui em todas as funções)
+        atendimentos = list(self.__atendimento_dao.get_all())
         
+        contagem_clinicas = {}
         for atendimento in atendimentos:
             nome_clinica = atendimento.clinica.nome
             if nome_clinica in contagem_clinicas:
@@ -45,9 +45,8 @@ class ControladorRelatorios:
         return clinicas_ordenadas
 
     # 2. Atendimentos mais caros e mais baratos
-    # Ordena a lista de atendimentos com base no valor total calculado, organizando do menor para o maior. Retorna diretamente os extremos dessa fila ordenada usando os índices [0] para capturar o atendimento mais barato e [-1] para capturar o mais caro.
     def relatorio_atendimentos_extremos(self):
-        atendimentos = self.__controlador_principal.atendimentos
+        atendimentos = list(self.__atendimento_dao.get_all())
         if not atendimentos:
             return None, None
             
@@ -58,14 +57,13 @@ class ControladorRelatorios:
         return mais_caro, mais_barato
 
     # 3. Procedimentos mais realizados (populares)
-    # Acessa a lista encapsulada de procedimentos de cada atendimento e utiliza um dicionário para contabilizar a frequência de execução de cada um. Em seguida, ordena a contagem em ordem decrescente para retornar os procedimentos mais populares no topo.
     def relatorio_procedimentos_mais_realizados(self):
-        atendimentos = self.__controlador_principal.atendimentos
+        atendimentos = list(self.__atendimento_dao.get_all())
         contagem_procedimentos = {}
         
         for atendimento in atendimentos:
-            # Aqui acessa a lista encapsulada 
-            for procedimento in atendimento._Atendimento__procedimentos: 
+            # Usando o get_procedimentos() em vez de quebrar o encapsulamento
+            for procedimento in atendimento.get_procedimentos(): 
                 nome_proc = procedimento.descricao
                 if nome_proc in contagem_procedimentos:
                     contagem_procedimentos[nome_proc] += 1
@@ -76,13 +74,13 @@ class ControladorRelatorios:
         return procedimentos_ordenados
 
     # 4. Procedimentos mais caros e mais baratos
-    # Extrai todos os procedimentos de todos os atendimentos para dentro de uma única lista consolidada utilizando o comando 'extend'. Depois, ordena essa lista geral pelo valor de custo e retorna os itens das extremidades [0] e [-1] representando o mais barato e o mais caro.
     def relatorio_procedimentos_extremos(self):
-        atendimentos = self.__controlador_principal.atendimentos
+        atendimentos = list(self.__atendimento_dao.get_all())
         todos_procedimentos = []
         
         for atendimento in atendimentos:
-            todos_procedimentos.extend(atendimento._Atendimento__procedimentos)
+            # Usando o get_procedimentos() aqui também
+            todos_procedimentos.extend(atendimento.get_procedimentos())
             
         if not todos_procedimentos:
             return None, None
