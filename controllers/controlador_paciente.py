@@ -73,6 +73,44 @@ class ControladorPaciente:
             }
             self.__view.mostrar_paciente(dados)
 
+    # se euo alterar o CPF, o controlador detecta isso e remove o registro velho
+    def alterar_paciente(self):
+        cpf = self.__view.selecionar_paciente()
+        paciente = self.buscar_paciente_por_cpf(cpf)
+
+        if not paciente:
+            self.__view.mostrar_erro("Paciente nao encontrado.")
+            return
+
+        novos_dados = self.__view.pegar_dados_paciente()
+        try:
+            novo_cpf = novos_dados["cpf"]
+            
+            # SE O CPF MUDOU, PRECISAMOS APAGAR A CHAVE VELHA DO ARQUIVO
+            if cpf != novo_cpf:
+                # Verifica se o novo CPF já não pertence a outra pessoa
+                paciente_existente = self.buscar_paciente_por_cpf(novo_cpf)
+                if paciente_existente:
+                    self.__view.mostrar_erro("Este novo CPF ja esta cadastrado em outro paciente.")
+                    return
+                
+                # Apaga o registro velho do arquivo
+                self.__paciente_dao.remove(cpf)
+
+            # Atualiza os dados do objeto
+            paciente.nome = novos_dados["nome"]
+            paciente.cpf = novo_cpf
+            paciente.celular = novos_dados["celular"]
+            paciente.data_nascimento = datetime.strptime(novos_dados["data_nascimento"], "%d/%m/%Y").date()
+            
+            # SALVA O OBJETO ATUALIZADO (com a chave correta)
+            self.__paciente_dao.add(paciente)
+            
+            self.__view.mostrar_mensagem("Dados alterados com sucesso!")
+            
+        except ValueError:
+            self.__view.mostrar_erro("Formato de data invalido. Alteracao cancelada.")
+
     def excluir_paciente(self):
         cpf = self.__view.selecionar_paciente()
         paciente = self.buscar_paciente_por_cpf(cpf)
@@ -81,6 +119,5 @@ class ControladorPaciente:
             self.__view.mostrar_erro("Paciente nao encontrado.")
             return
 
-        # AQUI SUBSTITUI O .remove() DA LISTA PELO .remove() DO DAO
         self.__paciente_dao.remove(paciente.cpf)
         self.__view.mostrar_mensagem("Paciente excluido com sucesso!")
