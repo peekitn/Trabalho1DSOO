@@ -1,19 +1,47 @@
-# Francisco
+import FreeSimpleGUI as sg
 
 class TelaPrincipal:
-    def tela_opcoes(self):
-        print("--- Menu Principal ---")
-        print("1 - Modulo de Pacientes")
-        print("2 - Modulo de Clinicas")
-        print("3 - Modulo de Relatorios")
-        print("4 - Modulo de Atendimentos")
-        print("5 - Modulo de Profissionais")
-        print("0 - Encerrar Sistema")
-        opcao = int(input("Escolha a opcao: "))
-        return opcao
-    
+    def __init__(self):
+        self.__window = None
+        self.init_components()
+
+    def init_components(self):
+        sg.theme('BlueMono')
+
+    def open(self):
+        button, values = self.__window.Read()
+        return button, values
+
+    def close(self):
+        if self.__window is not None:
+            self.__window.Close()
+        self.__window = None
+
     def mostrar_mensagem(self, mensagem: str):
-        print(f"\n[SISTEMA] {mensagem}")
+        sg.popup_ok(mensagem, title="[SISTEMA]", keep_on_top=True)
 
     def mostrar_erro(self, mensagem: str):
-        print(f"\n[ERRO] {mensagem}")
+        sg.popup_error(mensagem, title="[ERRO]", keep_on_top=True)
+
+    def tela_opcoes(self):
+        
+        layout = [
+            [sg.Text('--- Sistema de Gestão Médica ---', font=('Helvetica', 16, 'bold'), justification='center', expand_x=True)],
+            [sg.Text('Menu Principal', font=('Helvetica', 12), justification='center', expand_x=True)],
+            [sg.HSeparator(pad=(0, 15))],
+            
+            [sg.Button('Pacientes', key=1, size=(30, 2))],
+            [sg.Button('Clínicas', key=2, size=(30, 2))],
+            [sg.Button('Relatórios', key=3, size=(30, 2))],
+            [sg.Button('Atendimentos', key=4, size=(30, 2))],
+            [sg.Button('Profissionais', key=5, size=(30, 2))],
+            
+            [sg.HSeparator(pad=(0, 15))],
+            [sg.Button('Encerrar Sistema', key=0, button_color=('white', '#d32f2f'), size=(15, 1), expand_x=True)]
+        ]
+
+        window = sg.Window('Menu Principal', layout, element_justification='center', finalize=True)
+        event, _ = window.read()
+        window.close()
+        
+        return event if event is not None else 0
