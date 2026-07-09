@@ -2,37 +2,54 @@ import FreeSimpleGUI as sg
 
 class TelaPaciente:
     def __init__(self):
+        self.__window = None
+        self.init_components()
+
+    # seguindo o padrao do professor nos slides
+    def init_components(self):
         sg.theme('LightBlue')
 
+    def open(self):
+        button, values = self.__window.Read()
+        return button, values
+
+    def close(self):
+        if self.__window is not None:
+            self.__window.Close()
+        self.__window = None
+
+    def show_message(self, titulo: str, mensagem: str):
+        sg.Popup(mensagem, title=titulo, keep_on_top=True)
+
+    # adaptando pra nao quebrar o controlador
     def mostrar_mensagem(self, mensagem: str):
-        sg.popup_ok(mensagem, title="[SISTEMA]", keep_on_top=True)
+        self.show_message("[SISTEMA]", mensagem)
 
     def mostrar_erro(self, mensagem: str):
-        sg.popup_error(mensagem, title="[ERRO]", keep_on_top=True)
+        self.show_message("[ERRO]", mensagem)
 
+    # metodos da tela
     def tela_opcoes(self):
-
+        self.init_components()
         layout = [
             [sg.Text('--- Módulo de Pacientes ---', font=('Helvetica', 14, 'bold'), justification='center', expand_x=True)],
             [sg.HSeparator(pad=(0, 10))],
-            
             [sg.Button('Cadastrar Paciente', key=1, size=(25, 1))],
             [sg.Button('Listar Pacientes', key=2, size=(25, 1))],
             [sg.Button('Alterar Paciente', key=3, size=(25, 1))],
             [sg.Button('Excluir Paciente', key=4, size=(25, 1))],
-            
             [sg.HSeparator(pad=(0, 15))],
             [sg.Button('Voltar', key=0, button_color=('white', '#d32f2f'), size=(12, 1), expand_x=True)]
         ]
 
-        window = sg.Window('Menu Pacientes', layout, modal=True, element_justification='center')
-        event, _ = window.read()
-        window.close()
+        self.__window = sg.Window('Menu Pacientes', layout, modal=True, element_justification='center')
+        event, _ = self.open()
+        self.close()
         
         return event if event is not None else 0
 
     def pegar_dados_paciente(self):
-
+        self.init_components()
         layout = [
             [sg.Text('--- Dados do Paciente ---', font=('Helvetica', 12, 'bold'))],
             [sg.Text('Nome:', size=(28, 1)), sg.InputText(key='nome', size=(25, 1))],
@@ -43,9 +60,9 @@ class TelaPaciente:
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
         ]
 
-        window = sg.Window('Cadastrar/Alterar Paciente', layout, modal=True)
-        event, values = window.read()
-        window.close()
+        self.__window = sg.Window('Cadastrar/Alterar Paciente', layout, modal=True)
+        event, values = self.open()
+        self.close()
 
         if event == 'Confirmar':
             return {
@@ -67,4 +84,4 @@ class TelaPaciente:
             f"Celular: {dados_paciente.get('celular', '')}\n"
             f"Nascimento: {dados_paciente.get('data_nascimento', '')}"
         )
-        sg.popup_ok(texto_exibicao, title="Dados do Paciente", keep_on_top=True)
+        self.show_message("Dados do Paciente", texto_exibicao)

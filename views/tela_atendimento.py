@@ -5,34 +5,46 @@ class TelaAtendimento:
         self.__window = None
         self.init_components()
     
+    # seguindo o padrao do professor nos slides
     def init_components(self):
         sg.theme('LightBlue')
 
+    def open(self):
+        button, values = self.__window.Read()
+        return button, values
+    
+    def close(self):
+        if self.__window is not None:
+            self.__window.Close()
+        self.__window = None
+        
+    def show_message(self, titulo: str, mensagem: str):
+        sg.Popup(mensagem, title=titulo, keep_on_top=True)
+
+    # adaptando pra nao quebrar o controlador
     def mostrar_mensagem(self, mensagem: str):
-        sg.popup_ok(mensagem, title="[SISTEMA]", keep_on_top=True)
+        self.show_message("[SISTEMA]", mensagem)
 
     def mostrar_erro(self, mensagem: str):
-        sg.popup_error(mensagem, title="[ERRO]", keep_on_top=True)
+        self.show_message("[ERRO]", mensagem)
 
+    # metodos da tela
     def tela_opcoes(self):
-
+        self.init_components()
         layout = [
             [sg.Text('--- Módulo de Atendimentos ---', font=('Helvetica', 14, 'bold'), justification='center', expand_x=True)],
             [sg.HSeparator(pad=(0, 10))],
             
-            # Seção de Atendimentos
             [sg.Text('Atendimentos:', font=('Helvetica', 11, 'bold'))],
             [sg.Button('Agendar atendimento', key=1, size=(25, 1)), sg.Button('Listar atendimentos', key=2, size=(25, 1))],
             [sg.Button('Alterar atendimento', key=3, size=(25, 1)), sg.Button('Excluir atendimento', key=4, size=(25, 1))],
             [sg.VSeparator()],
             
-            # Seção de Procedimentos
             [sg.Text('Procedimentos:', font=('Helvetica', 11, 'bold'))],
             [sg.Button('Registrar procedimento', key=5, size=(25, 1)), sg.Button('Listar procedimentos', key=6, size=(25, 1))],
             [sg.Button('Alterar procedimento', key=7, size=(25, 1)), sg.Button('Remover procedimento', key=8, size=(25, 1))],
             [sg.VSeparator()],
             
-            # Seção de Pagamentos
             [sg.Text('Pagamentos:', font=('Helvetica', 11, 'bold'))],
             [sg.Button('Processar pagamento', key=9, size=(25, 1)), sg.Button('Listar pagamentos', key=10, size=(25, 1))],
             [sg.Button('Alterar pagamento', key=11, size=(25, 1)), sg.Button('Remover pagamento', key=12, size=(25, 1))],
@@ -41,15 +53,14 @@ class TelaAtendimento:
             [sg.Button('Voltar', key=0, button_color=('white', '#d32f2f'), size=(12, 1), expand_x=True)]
         ]
 
-        window = sg.Window('Menu Atendimentos', layout, modal=True, element_justification='center')
-        event, _ = window.read()
-        window.close()
+        self.__window = sg.Window('Menu Atendimentos', layout, modal=True, element_justification='center')
+        event, _ = self.open()
+        self.close()
         
-        # Se o usuário fechar o X da janela, retorna 0 (Voltar) para evitar quebra no Controller
         return event if event is not None else 0
 
     def ler_dados_agendamento(self):
-        #Abre formulário para coletar dados do agendamento.
+        self.init_components()
         layout = [
             [sg.Text('--- Dados do Agendamento ---', font=('Helvetica', 12, 'bold'))],
             [sg.Text('Data do atendimento (DD/MM/AAAA):', size=(28, 1)), sg.InputText(key='data', size=(15, 1))],
@@ -59,9 +70,9 @@ class TelaAtendimento:
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
         ]
 
-        window = sg.Window('Agendar Atendimento', layout, modal=True)
-        event, values = window.read()
-        window.close()
+        self.__window = sg.Window('Agendar Atendimento', layout, modal=True)
+        event, values = self.open()
+        self.close()
 
         if event == 'Confirmar':
             try:
@@ -69,10 +80,11 @@ class TelaAtendimento:
                 return values['data'], values['inicio'], values['fim'], valor_base
             except ValueError:
                 self.mostrar_erro("Valor Base inválido! Digite apenas números.")
-                return self.ler_dados_agendamento() # Tenta novamente se o float falhar
+                return self.ler_dados_agendamento() 
         return None, None, None, None
 
     def ler_dados_pagamento(self):
+        self.init_components()
         layout = [
             [sg.Text('--- Registro de Pagamento ---', font=('Helvetica', 12, 'bold'))],
             [sg.Text('Modalidade:')],
@@ -83,12 +95,11 @@ class TelaAtendimento:
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
         ]
 
-        window = sg.Window('Registrar Pagamento', layout, modal=True)
-        event, values = window.read()
-        window.close()
+        self.__window = sg.Window('Registrar Pagamento', layout, modal=True)
+        event, values = self.open()
+        self.close()
 
         if event == 'Confirmar':
-            # Identifica qual botão foi selecionado
             modalidade = '1' if values['1'] else ('2' if values['2'] else '3')
             try:
                 valor = float(values['valor'].replace(',', '.'))
@@ -99,31 +110,36 @@ class TelaAtendimento:
         return None, None
 
     def ler_dados_pix(self):
-
+        self.init_components()
         layout = [
             [sg.Text('Digite o CPF do pagador (PIX):')],
             [sg.InputText(key='cpf', size=(20, 1))],
             [sg.Button('OK')]
         ]
-        window = sg.Window('Dados PIX', layout, modal=True)
-        event, values = window.read()
-        window.close()
+        
+        self.__window = sg.Window('Dados PIX', layout, modal=True)
+        event, values = self.open()
+        self.close()
+        
         return values['cpf'].strip() if event == 'OK' else ""
 
     def ler_dados_cartao(self):
-
+        self.init_components()
         layout = [
             [sg.Text('Número do cartão:'), sg.InputText(key='cartao')],
             [sg.Text('Bandeira:'), sg.InputText(key='bandeira')],
             [sg.Button('OK')]
         ]
-        window = sg.Window('Dados Cartão', layout, modal=True)
-        event, values = window.read()
-        window.close()
+        
+        self.__window = sg.Window('Dados Cartão', layout, modal=True)
+        event, values = self.open()
+        self.close()
+        
         if event == 'OK':
             return values['cartao'].strip(), values['bandeira'].strip()
         return "", ""
 
+    # popup para pedir dados
     def pedir_cpf_paciente(self):
         resposta = sg.popup_get_text("Digite o CPF do Paciente:", title="Paciente")
         return resposta.strip() if resposta else ""
@@ -152,7 +168,7 @@ class TelaAtendimento:
         return self.pedir_indice("Digite o NÚMERO (índice):")
 
     def ler_dados_procedimento(self):
-        """Formulário para preencher o procedimento."""
+        self.init_components()
         layout = [
             [sg.Text('--- Registro de Procedimento ---', font=('Helvetica', 12, 'bold'))],
             [sg.Text('Descrição do procedimento:'), sg.InputText(key='descricao')],
@@ -160,9 +176,9 @@ class TelaAtendimento:
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
         ]
 
-        window = sg.Window('Registrar Procedimento', layout, modal=True)
-        event, values = window.read()
-        window.close()
+        self.__window = sg.Window('Registrar Procedimento', layout, modal=True)
+        event, values = self.open()
+        self.close()
 
         if event == 'Confirmar':
             try:
@@ -172,13 +188,3 @@ class TelaAtendimento:
                 self.mostrar_erro("Custo inválido!")
                 return self.ler_dados_procedimento()
         return None, None
-    
-    def open(self):
-        button, values = self._window.Read()
-        return button, values
-    
-    def close(self):
-        self._window.Close()
-        
-    def show_message(self, titulo: str, mensagem: str):
-        sg.Popup(titulo, mensagem)
