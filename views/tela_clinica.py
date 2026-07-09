@@ -7,7 +7,7 @@ class TelaClinica:
 
     # seguindo o padrao do professor nos slides
     def init_components(self):
-        sg.theme('LightBlue')
+        sg.theme('BlueMono')
 
     def open(self):
         button, values = self.__window.Read()
