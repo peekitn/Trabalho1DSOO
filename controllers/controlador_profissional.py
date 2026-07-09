@@ -40,7 +40,6 @@ class ControladorProfissional:
         if not cpf.isdigit() or len(cpf) != 11:
             raise CpfInvalidoException()
 
-    # BUSCA SIMPLIFICADA COM DAO
     def buscar_profissional_por_cpf(self, cpf: str):
         return self.__profissional_dao.get(cpf)
 
@@ -53,7 +52,6 @@ class ControladorProfissional:
             
             self._validar_cpf(cpf)
 
-            # VALIDAÇÃO DE DUPLICIDADE USANDO get_all()
             for prof in self.__profissional_dao.get_all():
                 if prof.cpf == cpf:
                     raise RegistroDuplicadoException(f"O CPF {cpf} ja esta cadastrado no sistema.")
@@ -62,7 +60,6 @@ class ControladorProfissional:
 
             novo_profissional = Profissional(nome, celular, cpf, especialidade, registro)
             
-            # SALVA NO ARQUIVO
             self.__profissional_dao.add(novo_profissional)
             
             self.__view.mostrar_mensagem(f"Profissional {nome} cadastrado com sucesso!")
@@ -93,7 +90,6 @@ class ControladorProfissional:
             if not profissional_para_remover:
                 raise RegistroNaoEncontradoException(f"Profissional com CPF {cpf} nao encontrado.")
             
-            # REMOVE DO ARQUIVO
             self.__profissional_dao.remove(cpf)
             self.__view.mostrar_mensagem("Profissional excluido com sucesso!")
 
@@ -120,25 +116,21 @@ class ControladorProfissional:
             self._validar_cpf(novo_cpf)
 
             for prof in self.__profissional_dao.get_all():
-                # Compara os CPFs para não bater com o próprio profissional sendo alterado
                 if prof.cpf != cpf:
                     if prof.cpf == novo_cpf:
                         raise RegistroDuplicadoException(f"O CPF {novo_cpf} ja esta cadastrado.")
                     if prof.registro_profissional == novo_registro:
                         raise RegistroDuplicadoException(f"O registro {novo_registro} ja esta vinculado a outro profissional.")
 
-            # SE O CPF MUDOU, PRECISAMOS APAGAR A CHAVE VELHA DO ARQUIVO
             if cpf != novo_cpf:
                 self.__profissional_dao.remove(cpf)
 
-            # Atualiza os dados
             profissional_para_alterar.nome = novo_nome
             profissional_para_alterar.celular = novo_celular
             profissional_para_alterar.cpf = novo_cpf
             profissional_para_alterar.especialidade = nova_especialidade
             profissional_para_alterar.registro_profissional = novo_registro
 
-            # SALVA O OBJETO ATUALIZADO (se o CPF mudou, ele cria a chave nova automaticamente)
             self.__profissional_dao.add(profissional_para_alterar)
 
             self.__view.mostrar_mensagem("Profissional alterado com sucesso!")

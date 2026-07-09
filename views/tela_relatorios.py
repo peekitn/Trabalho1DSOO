@@ -17,8 +17,18 @@ class TelaRelatorios:
             self.__window.Close()
         self.__window = None
 
-    def tela_opcoes(self):
+    def show_message(self, titulo: str, mensagem: str):
+        sg.Popup(mensagem, title=titulo, keep_on_top=True)
 
+    def mostrar_mensagem(self, mensagem: str):
+        self.show_message("[SISTEMA]", mensagem)
+
+    def mostrar_erro(self, mensagem: str):
+        self.show_message("[ERRO]", mensagem)
+
+    # --- MÉTODOS DA TELA ---
+    def tela_opcoes(self):
+        self.init_components()
         layout = [
             [sg.Text('--- Menu de Relatórios ---', font=('Helvetica', 14, 'bold'), justification='center', expand_x=True)],
             [sg.HSeparator(pad=(0, 10))],
@@ -32,15 +42,17 @@ class TelaRelatorios:
             [sg.Button('Retornar', key=0, button_color=('white', '#d32f2f'), size=(12, 1), expand_x=True)]
         ]
 
-        window = sg.Window('Menu Relatórios', layout, modal=True, element_justification='center')
-        event, _ = window.read()
-        window.close()
+        self.__window = sg.Window('Menu Relatórios', layout, modal=True, element_justification='center')
+        
+        event, _ = self.open()
+        
+        self.close()
         
         return event if event is not None else 0
 
     def mostrar_clinicas_mais_atendimentos(self, clinicas_ordenadas):
         if not clinicas_ordenadas:
-            sg.popup_ok("Nenhum atendimento registrado no sistema.", title="Relatório de Clínicas", keep_on_top=True)
+            self.show_message("Relatório de Clínicas", "Nenhum atendimento registrado no sistema.")
             return
 
         texto_relatorio = "--- Clínicas com Mais Atendimentos ---\n\n"
@@ -56,13 +68,13 @@ class TelaRelatorios:
                 f"Mais Caro: Paciente {mais_caro.paciente.nome} - Valor: R$ {mais_caro.calcular_valor_total():.2f}\n"
                 f"Mais Barato: Paciente {mais_barato.paciente.nome} - Valor: R$ {mais_barato.calcular_valor_total():.2f}"
             )
-            sg.popup_ok(texto, title="Atendimentos Extremos", keep_on_top=True)
+            self.show_message("Atendimentos Extremos", texto)
         else:
-            sg.popup_ok("Nenhum atendimento registrado no sistema.", title="Atendimentos Extremos", keep_on_top=True)
+            self.show_message("Atendimentos Extremos", "Nenhum atendimento registrado no sistema.")
 
     def mostrar_procedimentos_mais_realizados(self, procedimentos_ordenados):
         if not procedimentos_ordenados:
-            sg.popup_ok("Nenhum procedimento registrado no sistema.", title="Procedimentos Mais Populares", keep_on_top=True)
+            self.show_message("Procedimentos Mais Populares", "Nenhum procedimento registrado no sistema.")
             return
 
         texto_relatorio = "--- Procedimentos Mais Populares ---\n\n"
@@ -78,9 +90,6 @@ class TelaRelatorios:
                 f"Mais Caro: {mais_caro.descricao} - Custo: R$ {mais_caro.custo:.2f}\n"
                 f"Mais Barato: {mais_barato.descricao} - Custo: R$ {mais_barato.custo:.2f}"
             )
-            sg.popup_ok(texto, title="Procedimentos Extremos", keep_on_top=True)
+            self.show_message("Procedimentos Extremos", texto)
         else:
-            sg.popup_ok("Nenhum procedimento registrado no sistema.", title="Procedimentos Extremos", keep_on_top=True)
-
-    def mostrar_mensagem(self, mensagem):
-        sg.popup_ok(mensagem, title="[SISTEMA]", keep_on_top=True)
+            self.show_message("Procedimentos Extremos", "Nenhum procedimento registrado no sistema.")

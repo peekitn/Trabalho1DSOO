@@ -17,13 +17,17 @@ class TelaPrincipal:
             self.__window.Close()
         self.__window = None
 
+    def show_message(self, titulo: str, mensagem: str):
+        sg.Popup(mensagem, title=titulo, keep_on_top=True)
+
     def mostrar_mensagem(self, mensagem: str):
-        sg.popup_ok(mensagem, title="[SISTEMA]", keep_on_top=True)
+        self.show_message("[SISTEMA]", mensagem)
 
     def mostrar_erro(self, mensagem: str):
-        sg.popup_error(mensagem, title="[ERRO]", keep_on_top=True)
+        self.show_message("[ERRO]", mensagem)
 
     def tela_opcoes(self):
+        self.init_components()
         
         layout = [
             [sg.Text('--- Sistema de Gestão Médica ---', font=('Helvetica', 16, 'bold'), justification='center', expand_x=True)],
@@ -40,8 +44,10 @@ class TelaPrincipal:
             [sg.Button('Encerrar Sistema', key=0, button_color=('white', '#d32f2f'), size=(15, 1), expand_x=True)]
         ]
 
-        window = sg.Window('Menu Principal', layout, element_justification='center', finalize=True)
-        event, _ = window.read()
-        window.close()
+        self.__window = sg.Window('Menu Principal', layout, element_justification='center')
+        
+        event, _ = self.open()
+        
+        self.close()
         
         return event if event is not None else 0

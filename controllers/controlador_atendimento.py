@@ -87,6 +87,11 @@ class ControladorAtendimento:
             self.__view.mostrar_erro(str(e))
 
     def abrir_tela(self):
+        self.__paciente_dao = PacienteDAO()
+        self.__profissional_dao = ProfissionalDAO()
+        self.__clinica_dao = ClinicaDAO()
+        self.__atendimento_dao = AtendimentoDAO()
+
         while True:
             try:
                 opcao = self.__view.tela_opcoes()
@@ -123,7 +128,6 @@ class ControladorAtendimento:
                 self.__view.mostrar_erro("Digite um numero valido.")
 
     def _iniciar_agendamento(self):
-        # Agora checamos direto nos arquivos físicos se os cadastros existem!
         if not self.__paciente_dao.get_all():
             self.__view.mostrar_erro("Cadastre um paciente primeiro.")
             return
@@ -135,21 +139,18 @@ class ControladorAtendimento:
             return
 
         cpf_paciente = self.__view.pedir_cpf_paciente()
-        # Busca direta no DAO do Paciente
         paciente = self.__paciente_dao.get(cpf_paciente)
         if not paciente:
             self.__view.mostrar_erro("Paciente nao encontrado.")
             return
 
         cpf_prof = self.__view.pedir_cpf_profissional()
-        # Busca direta no DAO do Profissional
         profissional = self.__profissional_dao.get(cpf_prof)
         if not profissional:
             self.__view.mostrar_erro("Profissional nao encontrado.")
             return
 
         nome_clinica = self.__view.pedir_nome_clinica()
-        # Varre o DAO da Clínica para achar o nome
         clinica = next((c for c in self.__clinica_dao.get_all() if c.nome.lower() == nome_clinica.lower()), None)
         if not clinica:
             self.__view.mostrar_erro("Clinica nao encontrada.")

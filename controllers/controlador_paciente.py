@@ -49,7 +49,6 @@ class ControladorPaciente:
                 data_nascimento=data_nasc_formatada
             )
             
-            # AQUI FOI SUBSTITUIDO O .append() DA LISTA PELO .add() DO DAO
             self.__paciente_dao.add(novo_paciente)
             self.__view.mostrar_mensagem("Paciente cadastrado com sucesso!")
         except ValueError:
@@ -73,7 +72,6 @@ class ControladorPaciente:
             }
             self.__view.mostrar_paciente(dados)
 
-    # se euo alterar o CPF, o controlador detecta isso e remove o registro velho
     def alterar_paciente(self):
         cpf = self.__view.selecionar_paciente()
         paciente = self.buscar_paciente_por_cpf(cpf)
@@ -86,24 +84,19 @@ class ControladorPaciente:
         try:
             novo_cpf = novos_dados["cpf"]
             
-            # SE O CPF MUDOU, PRECISAMOS APAGAR A CHAVE VELHA DO ARQUIVO
             if cpf != novo_cpf:
-                # Verifica se o novo CPF já não pertence a outra pessoa
                 paciente_existente = self.buscar_paciente_por_cpf(novo_cpf)
                 if paciente_existente:
                     self.__view.mostrar_erro("Este novo CPF ja esta cadastrado em outro paciente.")
                     return
                 
-                # Apaga o registro velho do arquivo
                 self.__paciente_dao.remove(cpf)
 
-            # Atualiza os dados do objeto
             paciente.nome = novos_dados["nome"]
             paciente.cpf = novo_cpf
             paciente.celular = novos_dados["celular"]
             paciente.data_nascimento = datetime.strptime(novos_dados["data_nascimento"], "%d/%m/%Y").date()
             
-            # SALVA O OBJETO ATUALIZADO (com a chave correta)
             self.__paciente_dao.add(paciente)
             
             self.__view.mostrar_mensagem("Dados alterados com sucesso!")

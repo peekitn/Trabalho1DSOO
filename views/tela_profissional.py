@@ -17,14 +17,17 @@ class TelaProfissional:
             self.__window.Close()
         self.__window = None
 
+    def show_message(self, titulo: str, mensagem: str):
+        sg.Popup(mensagem, title=titulo, keep_on_top=True)
+
     def mostrar_mensagem(self, mensagem: str):
-        sg.popup_ok(mensagem, title="[SISTEMA]", keep_on_top=True)
+        self.show_message("[SISTEMA]", mensagem)
 
     def mostrar_erro(self, mensagem: str):
-        sg.popup_error(mensagem, title="[ERRO]", keep_on_top=True)
+        self.show_message("[ERRO]", mensagem)
 
     def tela_opcoes(self):
-
+        self.init_components()
         layout = [
             [sg.Text('--- Módulo de Profissionais ---', font=('Helvetica', 14, 'bold'), justification='center', expand_x=True)],
             [sg.HSeparator(pad=(0, 10))],
@@ -38,14 +41,16 @@ class TelaProfissional:
             [sg.Button('Voltar', key=0, button_color=('white', '#d32f2f'), size=(12, 1), expand_x=True)]
         ]
 
-        window = sg.Window('Menu Profissionais', layout, modal=True, element_justification='center')
-        event, _ = window.read()
-        window.close()
+        self.__window = sg.Window('Menu Profissionais', layout, modal=True, element_justification='center')
+        
+        event, _ = self.open()
+        
+        self.close()
         
         return event if event is not None else 0
 
     def ler_dados_profissional(self):
-
+        self.init_components()
         layout = [
             [sg.Text('--- Dados do Profissional ---', font=('Helvetica', 12, 'bold'))],
             [sg.Text('Nome:', size=(25, 1)), sg.InputText(key='nome', size=(30, 1))],
@@ -57,9 +62,9 @@ class TelaProfissional:
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
         ]
 
-        window = sg.Window('Dados do Profissional', layout, modal=True)
-        event, values = window.read()
-        window.close()
+        self.__window = sg.Window('Dados do Profissional', layout, modal=True)
+        event, values = self.open()
+        self.close()
 
         if event == 'Confirmar':
             return (
@@ -70,12 +75,11 @@ class TelaProfissional:
                 values['registro'].strip()
             )
         
-
         return "", "", "", "", ""
 
     def mostrar_profissional(self, nome, cpf, especialidade, registro):
         texto = f"Profissional: {nome}\nCPF: {cpf}\nEspecialidade: {especialidade}\nRegistro: {registro}"
-        sg.popup_ok(texto, title="Dados do Profissional", keep_on_top=True)
+        self.show_message("Dados do Profissional", texto)
 
     def ler_dado_exclusao(self):
         resposta = sg.popup_get_text("Digite o CPF do profissional:", title="Buscar Profissional")

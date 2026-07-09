@@ -1,13 +1,14 @@
 from views.tela_relatorios import TelaRelatorios
-from daos.atendimento_dao import AtendimentoDAO  # Importa o DAO
+from daos.atendimento_dao import AtendimentoDAO  
 
 class ControladorRelatorios:
     def __init__(self, controlador_principal):
         self.__controlador_principal = controlador_principal
         self.__tela_relatorios = TelaRelatorios()
-        self.__atendimento_dao = AtendimentoDAO()  # Instancia o DAO
+        self.__atendimento_dao = AtendimentoDAO()  
 
     def abrir_tela(self):
+        self.__atendimento_dao = AtendimentoDAO()
         while True:
             opcao = self.__tela_relatorios.tela_opcoes()
             
@@ -30,7 +31,6 @@ class ControladorRelatorios:
 
     # 1. Clínicas com maior número de atendimentos
     def relatorio_clinicas_mais_atendimentos(self):
-        # AQUI É A GRANDE MUDANÇA (Substitui em todas as funções)
         atendimentos = list(self.__atendimento_dao.get_all())
         
         contagem_clinicas = {}
@@ -79,7 +79,6 @@ class ControladorRelatorios:
         todos_procedimentos = []
         
         for atendimento in atendimentos:
-            # Usando o get_procedimentos() aqui também
             todos_procedimentos.extend(atendimento.get_procedimentos())
             
         if not todos_procedimentos:
